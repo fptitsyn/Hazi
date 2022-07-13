@@ -89,7 +89,22 @@ class EditTaskFragment : Fragment() {
             taskPosition = bundle.getInt(TASK_POSITION)
         }
 
-        // Create menu
+        createMenu()
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+
+        // Restoring task date on screen rotation
+        if (savedInstanceState != null) {
+            with (savedInstanceState) {
+                taskDate = getString(AddTaskFragment.TASK_DATE).toString()
+                binding.editDateTextView.text = taskDate
+            }
+        }
+    }
+
+    private fun createMenu() {
         val menuHost: MenuHost = requireActivity()
 
         menuHost.addMenuProvider(object : MenuProvider {
@@ -112,18 +127,6 @@ class EditTaskFragment : Fragment() {
             }
 
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-
-        // Restoring task date on screen rotation
-        if (savedInstanceState != null) {
-            with (savedInstanceState) {
-                taskDate = getString(AddTaskFragment.TASK_DATE).toString()
-                binding.editDateTextView.text = taskDate
-            }
-        }
     }
 
     private fun initDatabase() {

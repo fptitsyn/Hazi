@@ -1,17 +1,27 @@
 package com.android.application.hazi.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentShopBinding
 import com.android.application.hazi.models.ShopItem
 import com.android.application.hazi.utils.ShopItemActionListener
 import com.android.application.hazi.utils.ShopItemsAdapter
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class ShopFragment : Fragment() {
 
@@ -34,6 +44,31 @@ class ShopFragment : Fragment() {
         binding = FragmentShopBinding.bind(view)
 
         initShopItemsRecyclerView()
+
+        val database = FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
+
+        val currentUserId = Firebase.auth.currentUser?.uid
+
+        lifecycleScope.launch {
+            val userDatabaseReference = database.reference.child("users")
+                .orderByChild("id").equalTo(currentUserId).get()
+                .await().children.first().ref
+
+            val userCoins = userDatabaseReference.child("coins")
+
+            userCoins.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val coins = snapshot.value.toString().toInt()
+
+                    // Make button disabled if user doesn't have enough coins and display the coins amount
+                    binding.userCoins.text = "$coins coins"
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(ShopItemFragment.TAG, "Database error occurred: $error")
+                }
+            })
+        }
     }
 
     private fun initShopItemsRecyclerView() {

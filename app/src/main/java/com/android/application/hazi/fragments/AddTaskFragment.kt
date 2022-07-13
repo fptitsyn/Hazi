@@ -2,10 +2,10 @@ package com.android.application.hazi.fragments
 
 import android.os.Bundle
 import android.view.*
-import androidx.fragment.app.Fragment
 import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,7 +20,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.util.*
 
 class AddTaskFragment : Fragment() {
 
@@ -62,7 +61,22 @@ class AddTaskFragment : Fragment() {
             binding.dateTextView.visibility = View.VISIBLE
         }
 
-        // Create menu
+        createMenu()
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+
+        // Retain saved date and update ui accordingly
+        if (savedInstanceState != null) {
+            with (savedInstanceState) {
+                taskDate = getString(TASK_DATE).toString()
+                binding.dateTextView.text = taskDate
+            }
+        }
+    }
+
+    private fun createMenu() {
         val menuHost: MenuHost = requireActivity()
 
         menuHost.addMenuProvider(object : MenuProvider {
@@ -81,18 +95,6 @@ class AddTaskFragment : Fragment() {
             }
 
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-
-        // Retain saved date and update ui accordingly
-        if (savedInstanceState != null) {
-            with (savedInstanceState) {
-                taskDate = getString(AddTaskFragment.TASK_DATE).toString()
-                binding.dateTextView.text = taskDate
-            }
-        }
     }
 
     private fun initDatabase() {

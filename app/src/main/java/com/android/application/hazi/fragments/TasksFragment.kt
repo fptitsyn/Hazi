@@ -1,5 +1,6 @@
 package com.android.application.hazi.fragments
 
+import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -34,10 +35,14 @@ class TasksFragment : Fragment() {
     private lateinit var tasksListener: ChildEventListener
 
     private lateinit var database: FirebaseDatabase
-    private lateinit var tasksDatabaseReference: DatabaseReference
+    private lateinit var userDatabaseReference: DatabaseReference
     private lateinit var auth: FirebaseAuth
 
     private lateinit var binding: FragmentTasksBinding
+
+    companion object {
+        val TAG: String = TasksFragment::class.java.simpleName
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,18 +61,21 @@ class TasksFragment : Fragment() {
 
         val currentUserId = auth.currentUser?.uid
         lifecycleScope.launch {
-            tasksDatabaseReference = database.reference.child("users")
+            userDatabaseReference = database.reference.child("users")
                 .orderByChild("id").equalTo(currentUserId).get()
-                .await().children.first().ref.child("tasks")
+                .await().children.first().ref
 
-            tasksDatabaseReference.addChildEventListener(tasksListener)
+            userDatabaseReference.child("tasks").addChildEventListener(tasksListener)
         }
 
         binding.addTaskFloatingActionButton.setOnClickListener { addTask() }
 
         initTaskRecyclerView()
 
-        // Create menu
+        createMenu()
+    }
+
+    private fun createMenu() {
         val menuHost: MenuHost = requireActivity()
 
         menuHost.addMenuProvider(object : MenuProvider {
@@ -95,44 +103,13 @@ class TasksFragment : Fragment() {
         tasksAdapter = TasksAdapter(tasks, object : TaskActionListener {
             // Handle click on task and open task editing mode
             override fun onTaskClick(task: Task) {
-                val direction = TasksFragmentDirections.actionTasksFragmentToEditTaskFragment(
-                    task.name!!,
-                    task.description,
-                    task.difficulty!!,
-                    task.priority!!,
-                    task.date,
-                    tasks.indexOf(task)
-                )
-
-                findNavController().navigate(direction)
+                editTask(task)
             }
 
             // Handle click on task's checkbox and complete the task
             override fun onTaskCompleted(task: Task, checkBox: CheckBox) {
-                if (checkBox.isChecked) {
-                    val taskQuery = tasksDatabaseReference.orderByChild("name").equalTo(task.name)
-
-                    taskQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            for (taskSnapshot in snapshot.children) {
-                                taskSnapshot.ref.removeValue()
-                                break
-                            }
-                            Toast.makeText(context, "Task completed!", Toast.LENGTH_SHORT).show()
-                            checkBox.isChecked = false
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                            Toast.makeText(
-                                context,
-                                "Couldn't complete the task",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    })
-                }
+                completeTask(task, checkBox)
             }
-
         })
 
         taskRecyclerView.adapter = tasksAdapter
@@ -198,7 +175,7 @@ class TasksFragment : Fragment() {
 
     // Sign out from the account
     private fun signOut() {
-        tasksDatabaseReference.removeEventListener(tasksListener)
+        userDatabaseReference.child("tasks").removeEventListener(tasksListener)
         auth.signOut()
         val topLevelHost = requireActivity().supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment?
         val topLevelNavController = topLevelHost?.navController ?: findNavController()
@@ -213,6 +190,66 @@ class TasksFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        tasksDatabaseReference.removeEventListener(tasksListener)
+        userDatabaseReference.child("tasks").removeEventListener(tasksListener)
+    }
+
+    private fun editTask(task: Task) {
+        val direction = TasksFragmentDirections.actionTasksFragmentToEditTaskFragment(
+            task.name!!,
+            task.description,
+            task.difficulty!!,
+            task.priority!!,
+            task.date,
+            tasks.indexOf(task)
+        )
+
+        findNavController().navigate(direction)
+    }
+
+    private fun completeTask(task: Task, checkBox: CheckBox) {
+        if (checkBox.isChecked) {
+            val taskQuery = userDatabaseReference.child("tasks").orderByChild("name").equalTo(task.name)
+
+            taskQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (taskSnapshot in snapshot.children) {
+                        taskSnapshot.ref.removeValue()
+                        break
+                    }
+
+                    // Possibly make award depend on if the task was completed in time
+                    val coinsAward = 5 + 1 * task.difficulty!!
+
+                    addCoinsToCurrentUser(coinsAward)
+
+                    Toast.makeText(context, "+$coinsAward coins!", Toast.LENGTH_SHORT).show()
+                    checkBox.isChecked = false
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(
+                        context,
+                        "Couldn't complete the task",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+        }
+    }
+
+    private fun addCoinsToCurrentUser(coinsToAdd: Int) {
+        val userCoins = userDatabaseReference.child("coins")
+
+        userCoins.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val currentCoins = snapshot.value.toString().toInt()
+
+                userCoins.setValue(currentCoins + coinsToAdd)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d(TAG, "Database error occurred: $error")
+            }
+        })
     }
 }

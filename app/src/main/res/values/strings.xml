@@ -28,4 +28,5 @@
     <string name="shop_item_price">Shop item price</string>
     <string name="shop">Shop</string>
     <string name="buy">Buy</string>
+    <string name="user_coins">User Coins</string>
 </resources>
