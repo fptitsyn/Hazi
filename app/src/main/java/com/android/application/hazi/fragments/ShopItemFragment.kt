@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentShopItemScreenBinding
@@ -124,5 +125,9 @@ class ShopItemFragment : Fragment() {
             "$shopItemName has been bought successfully",
             Toast.LENGTH_SHORT
         ).show()
+
+        // Add animation of closing or don't close it but show the message that the item has been bought
+        Thread.sleep(10)
+        findNavController().navigateUp()
     }
 }
