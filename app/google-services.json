@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "566141579789",
+    "project_id": "hazi-8190a",
+    "storage_bucket": "hazi-8190a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566141579789:android:6c22ec3296c8b553bd5b44",
+        "android_client_info": {
+          "package_name": "com.android.application.hazi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "566141579789-ih18ov41i5fs5n5gdvbgh8vefdbf3t7a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.application.hazi",
+            "certificate_hash": "67365ee0227a4243f18e67d6ab2d3b0a4b64faba"
+          }
+        },
+        {
+          "client_id": "566141579789-t648mv6ql836fp4pgaioptt3243vk4sr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2Xt6Vr1R8TenJpIHnIZYOj4r8xlERu1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "566141579789-t648mv6ql836fp4pgaioptt3243vk4sr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

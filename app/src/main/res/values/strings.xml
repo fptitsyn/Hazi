@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Hazi</string>
+    <string name="add_task">Add Task</string>
+    <string name="task_name">Task name…</string>
+    <string name="task_description">Task description… (optional)</string>
+    <string name="task_difficulty">Task difficulty</string>
+    <string name="delete_task">Delete Task</string>
+    <string name="save_task">Save Task</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="enter_email">Enter email…</string>
+    <string name="enter_password">Enter password…</string>
+    <string name="sign_up">Sign up</string>
+    <string name="log_in_textview">Already have an account? Tap to log in</string>
+    <string name="confirm_password">Confirm password…</string>
+    <string name="tap_to_sign_up">Tap to sign up</string>
+    <string name="log_in">Log In</string>
+    <string name="create_account">Create Account</string>
+    <string name="sign_in">Sign In</string>
+    <string name="edit_task">Edit Task</string>
+    <string name="tasks">Tasks</string>
+    <string name="dialog_delete_task_confirmation">Are you sure?</string>
+    <string name="cancel">Cancel</string>
+    <string name="task_priority">Task priority</string>
+    <string name="due_date">Due date</string>
+    <string name="date">Date</string>
+    <string name="shop_item_image">Shop item image</string>
+    <string name="shop_item_name">Shop item name</string>
+    <string name="shop_item_price">Shop item price</string>
+    <string name="shop">Shop</string>
+    <string name="buy">Buy</string>
+</resources>
