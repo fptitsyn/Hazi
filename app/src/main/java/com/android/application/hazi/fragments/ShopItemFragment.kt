@@ -98,20 +98,22 @@ class ShopItemFragment : Fragment() {
 
             userShopItemsRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val shopItems: HashMap<*, HashMap<String, *>> =
-                        snapshot.value as HashMap<String, HashMap<String, *>>
+                    if (snapshot.value != null) {
+                        val shopItems: HashMap<*, HashMap<String, *>> =
+                            snapshot.value as HashMap<String, HashMap<String, *>>
 
-                    for (shopItem in shopItems.values) {
-                        Log.d(TAG, shopItem.toString())
-                        val userShopItemName = shopItem.get("name")
-                        if (shopItemName == userShopItemName) {
-                            binding.buyShopItemButton.isEnabled = false
-                            canBuyItem = false
-                            Toast.makeText(
-                                requireContext(),
-                                "Item already owned",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        for (shopItem in shopItems.values) {
+                            Log.d(TAG, shopItem.toString())
+                            val userShopItemName = shopItem["name"]
+                            if (shopItemName == userShopItemName) {
+                                binding.buyShopItemButton.isEnabled = false
+                                canBuyItem = false
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Item already owned",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
                 }
