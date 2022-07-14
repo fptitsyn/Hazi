@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -29,6 +28,8 @@ class ShopFragment : Fragment() {
     private lateinit var adapter: ShopItemsAdapter
 
     private lateinit var shopItems: MutableList<ShopItem>
+
+    private var userCoins = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,14 +55,15 @@ class ShopFragment : Fragment() {
                 .orderByChild("id").equalTo(currentUserId).get()
                 .await().children.first().ref
 
-            val userCoins = userDatabaseReference.child("coins")
+            val userCoinsRef = userDatabaseReference.child("coins")
 
-            userCoins.addListenerForSingleValueEvent(object : ValueEventListener {
+            userCoinsRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val coins = snapshot.value.toString().toInt()
+                    userCoins = snapshot.value.toString().toInt()
 
                     // Make button disabled if user doesn't have enough coins and display the coins amount
-                    binding.userCoins.text = "$coins coins"
+                    binding.userCoins.text = "$userCoins coins"
+                    binding.userCoins.visibility = View.VISIBLE
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -85,7 +87,8 @@ class ShopFragment : Fragment() {
                 val direction = ShopFragmentDirections.actionShopFragmentToShopItemFragment(
                     shopItem.name.toString(),
                     shopItem.price.toString(),
-                    shopItem.image
+                    shopItem.image,
+                    userCoins
                 )
                 findNavController().navigate(direction)
             }

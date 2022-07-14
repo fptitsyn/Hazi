@@ -28,5 +28,8 @@
             android:name="shopItemImage"
             app:argType="string"
             app:nullable="true" />
+        <argument
+            android:name="userCoins"
+            app:argType="integer" />
     </fragment>
 </navigation>

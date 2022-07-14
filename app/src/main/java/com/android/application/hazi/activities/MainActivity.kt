@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         ActivityMainBinding.inflate(layoutInflater).also { setContentView(it.root) }
 
-        Firebase.auth.signOut()
         val navController = getRootNavController()
         prepareRootNavController(isSignedIn(), navController)
         onNavControllerActivated(navController)

@@ -30,7 +30,7 @@ class ShopItemFragment : Fragment() {
     private lateinit var userDatabaseReference: DatabaseReference
     private var currentUserId: String? = ""
 
-    private var coins = 0
+    private var userCoins = 0
 
     private var canBuyItem = true
 
@@ -55,13 +55,14 @@ class ShopItemFragment : Fragment() {
         val shopItemName = args.shopItemName
         val shopItemPrice = args.shopItemPrice
         val shopItemImage = args.shopItemImage
+        userCoins = args.userCoins
 
         binding.buyShopItemButton.setOnClickListener {
             buyShopItem(
                 shopItemName,
                 shopItemPrice,
                 shopItemImage.toString(),
-                coins
+                userCoins
             )
         }
 
@@ -80,11 +81,12 @@ class ShopItemFragment : Fragment() {
             binding.shopItemImageView.setImageResource(R.drawable.ic_shop)
         }
 
-        updateUiFromDatabase(shopItemName, shopItemPrice)
-    }
+        // Make button disabled if user doesn't have enough coins and display the coins amount
+        binding.userCoins.text = "$userCoins coins"
+        binding.userCoins.visibility = View.VISIBLE
 
-    private fun updateUiFromDatabase(shopItemName: String, shopItemPrice: String) {
-        // Get user coins
+        // Checking if an item is already bought
+        // This is being done in that method because it looks like the database operations complete faster this way
         database =
             FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
 
@@ -108,32 +110,22 @@ class ShopItemFragment : Fragment() {
                             if (shopItemName == userShopItemName) {
                                 binding.buyShopItemButton.isEnabled = false
                                 canBuyItem = false
+
                                 Toast.makeText(
                                     requireContext(),
                                     "Item already owned",
                                     Toast.LENGTH_SHORT
                                 ).show()
+
+                                break
                             }
                         }
+
+                        // If an item is not already bought, check if user has enough money to buy the item
+                        if (canBuyItem) {
+                            binding.buyShopItemButton.isEnabled = userCoins >= shopItemPrice.toInt()
+                        }
                     }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d(TAG, "Database error occurred: $error")
-                }
-            })
-
-            val userCoins = userDatabaseReference.child("coins")
-
-            userCoins.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    coins = snapshot.value.toString().toInt()
-
-                    // Make button disabled if user doesn't have enough coins and display the coins amount
-                    if (canBuyItem) {
-                        binding.buyShopItemButton.isEnabled = coins >= shopItemPrice.toInt()
-                    }
-                    binding.userCoins.text = "$coins coins"
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -153,8 +145,11 @@ class ShopItemFragment : Fragment() {
         val shopItem = ShopItem(shopItemName, shopItemPrice.toInt(), shopItemImage)
         userShopItems.push().setValue(shopItem)
 
-        val userCoins = userDatabaseReference.child("coins")
-        userCoins.setValue(coins - shopItemPrice.toInt())
+        val userCoinsRef = userDatabaseReference.child("coins")
+        val coinsUpdated = coins - shopItemPrice.toInt()
+        userCoinsRef.setValue(coinsUpdated)
+
+        binding.userCoins.text = coinsUpdated.toString()
 
         Toast.makeText(
             requireContext(),

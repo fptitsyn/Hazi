@@ -85,7 +85,13 @@ class EditTaskFragment : Fragment() {
 
         // Update date
         setFragmentResultListener(DatePickerDialogFragment.REQUEST_KEY) { _, bundle ->
-            binding.editDateTextView.text = bundle.getString(DatePickerDialogFragment.KEY_RESPONSE).toString()
+            val dateText = bundle.getString(DatePickerDialogFragment.KEY_RESPONSE).toString()
+
+            if (dateText.isNotBlank() && dateText != "Date") {
+                binding.editDateTextView.text = dateText
+                binding.editDateTextView.visibility = View.VISIBLE
+            }
+
             taskPosition = bundle.getInt(TASK_POSITION)
         }
 
@@ -97,7 +103,7 @@ class EditTaskFragment : Fragment() {
 
         // Restoring task date on screen rotation
         if (savedInstanceState != null) {
-            with (savedInstanceState) {
+            with(savedInstanceState) {
                 taskDate = getString(AddTaskFragment.TASK_DATE).toString()
                 binding.editDateTextView.text = taskDate
             }
@@ -185,31 +191,32 @@ class EditTaskFragment : Fragment() {
     private fun setupDeletionConfirmDialog() {
         val taskQuery = tasksDatabaseReference.orderByChild("name").equalTo(taskToEditName)
 
-        parentFragmentManager.setFragmentResultListener(DeleteTaskDialogFragment.REQUEST_KEY,
-            viewLifecycleOwner,
-            FragmentResultListener {_, result ->
-                val which = result.getInt(DeleteTaskDialogFragment.KEY_RESPONSE)
-                when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> taskQuery.addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            for (taskSnapshot in snapshot.children) {
-                                taskSnapshot.ref.removeValue()
-                                break
-                            }
-
-                            findNavController().popBackStack()
+        parentFragmentManager.setFragmentResultListener(
+            DeleteTaskDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+            when (result.getInt(DeleteTaskDialogFragment.KEY_RESPONSE)) {
+                DialogInterface.BUTTON_POSITIVE -> taskQuery.addListenerForSingleValueEvent(object :
+                    ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (taskSnapshot in snapshot.children) {
+                            taskSnapshot.ref.removeValue()
+                            break
                         }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            Toast.makeText(
-                                activity,
-                                "Couldn't delete the task",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    })
-                }
-        })
+                        findNavController().popBackStack()
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(
+                            activity,
+                            "Couldn't delete the task",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                })
+            }
+        }
     }
 
     private fun showDatePickerDialog() {

@@ -190,7 +190,10 @@ class TasksFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
-        userDatabaseReference.child("tasks").removeEventListener(tasksListener)
+
+        if (this::userDatabaseReference.isInitialized) {
+            userDatabaseReference.child("tasks").removeEventListener(tasksListener)
+        }
     }
 
     private fun editTask(task: Task) {
