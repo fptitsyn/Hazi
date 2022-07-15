@@ -29,4 +29,8 @@
     <string name="shop">Shop</string>
     <string name="buy">Buy</string>
     <string name="user_coins">0 Coins</string>
+    <string name="feed_pet">Feed Pet</string>
+    <string name="hunger">Hunger:</string>
+    <string name="energy">Energy:</string>
+    <string name="pet">Pet</string>
 </resources>

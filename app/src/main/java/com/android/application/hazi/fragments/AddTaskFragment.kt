@@ -13,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentAddTaskBinding
 import com.android.application.hazi.models.Task
-import com.android.application.hazi.utils.DatePickerDialogFragment
+import com.android.application.hazi.dialogs.DatePickerDialogFragment
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase

@@ -5,6 +5,10 @@
         android:title="@string/tasks"
         android:icon="@drawable/ic_tasks" />
 
+    <item android:id="@id/pet"
+        android:title="@string/pet"
+        android:icon="@drawable/ic_pet" />
+
     <item android:id="@id/shop"
         android:title="@string/shop"
         android:icon="@drawable/ic_shop" />

@@ -14,8 +14,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentEditTaskBinding
-import com.android.application.hazi.utils.DatePickerDialogFragment
-import com.android.application.hazi.utils.DeleteTaskDialogFragment
+import com.android.application.hazi.dialogs.DatePickerDialogFragment
+import com.android.application.hazi.dialogs.DeleteTaskDialogFragment
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
@@ -104,7 +104,7 @@ class EditTaskFragment : Fragment() {
         // Restoring task date on screen rotation
         if (savedInstanceState != null) {
             with(savedInstanceState) {
-                taskDate = getString(AddTaskFragment.TASK_DATE).toString()
+                taskDate = getString(TASK_DATE).toString()
                 binding.editDateTextView.text = taskDate
             }
         }

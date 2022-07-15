@@ -26,7 +26,6 @@ class ShopItemFragment : Fragment() {
 
     private val args by navArgs<ShopItemFragmentArgs>()
 
-    private lateinit var database: FirebaseDatabase
     private lateinit var userDatabaseReference: DatabaseReference
     private var currentUserId: String? = ""
 
@@ -87,7 +86,7 @@ class ShopItemFragment : Fragment() {
 
         // Checking if an item is already bought
         // This is being done in that method because it looks like the database operations complete faster this way
-        database =
+        val database =
             FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
 
         currentUserId = Firebase.auth.currentUser?.uid
