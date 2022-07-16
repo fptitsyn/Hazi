@@ -17,7 +17,7 @@
         android:id="@+id/shopItemFragment"
         android:name="com.android.application.hazi.fragments.ShopItemFragment"
         android:label="{shopItemName}"
-        tools:layout="@layout/fragment_shop_item_screen">
+        tools:layout="@layout/fragment_shop_item">
         <argument
             android:name="shopItemName"
             app:argType="string" />

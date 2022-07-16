@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.android.application.hazi.R
-import com.android.application.hazi.databinding.FragmentShopItemScreenBinding
+import com.android.application.hazi.databinding.FragmentShopItemBinding
 import com.android.application.hazi.models.ShopItem
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.ktx.auth
@@ -22,7 +22,7 @@ import kotlinx.coroutines.tasks.await
 
 class ShopItemFragment : Fragment() {
 
-    private lateinit var binding: FragmentShopItemScreenBinding
+    private lateinit var binding: FragmentShopItemBinding
 
     private val args by navArgs<ShopItemFragmentArgs>()
 
@@ -42,13 +42,13 @@ class ShopItemFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_shop_item_screen, container, false)
+        return inflater.inflate(R.layout.fragment_shop_item, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding = FragmentShopItemScreenBinding.bind(view)
+        binding = FragmentShopItemBinding.bind(view)
 
         // Get shop item info
         val shopItemName = args.shopItemName
@@ -68,7 +68,7 @@ class ShopItemFragment : Fragment() {
         // Update UI
         binding.shopItemNameTextView.text = shopItemName
         binding.shopItemPriceTextView.text = shopItemPrice
-        if (shopItemImage!!.isNotBlank()) {
+        if (!shopItemImage.isNullOrBlank()) {
             Glide.with(binding.shopItemImageView.context)
                 .load(shopItemImage)
                 .centerCrop()

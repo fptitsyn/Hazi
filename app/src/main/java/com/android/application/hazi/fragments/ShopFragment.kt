@@ -25,7 +25,6 @@ import kotlinx.coroutines.tasks.await
 class ShopFragment : Fragment() {
 
     private lateinit var binding: FragmentShopBinding
-    private lateinit var adapter: ShopItemsAdapter
 
     private lateinit var shopItems: MutableList<ShopItem>
 
@@ -82,7 +81,7 @@ class ShopFragment : Fragment() {
             ShopItem("A sweater", 50, "https://avatars.mds.yandex.net/i?id=4b3837071cca0fdb256aa2893a62168b-5583010-images-thumbs&n=13")
         )
         
-        adapter = ShopItemsAdapter(shopItems, object : ShopItemActionListener {
+        val adapter = ShopItemsAdapter(shopItems, object : ShopItemActionListener {
             override fun onShopItemClick(shopItem: ShopItem) {
                 val direction = ShopFragmentDirections.actionShopFragmentToShopItemFragment(
                     shopItem.name.toString(),

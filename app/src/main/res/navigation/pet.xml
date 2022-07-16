@@ -9,5 +9,31 @@
         android:id="@+id/petFragment"
         android:name="com.android.application.hazi.fragments.PetFragment"
         android:label="@string/pet"
-        tools:layout="@layout/fragment_pet" />
+        tools:layout="@layout/fragment_pet" >
+        <action
+            android:id="@+id/action_petFragment_to_lockerFragment"
+            app:destination="@id/lockerFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/lockerFragment"
+        android:name="com.android.application.hazi.fragments.LockerFragment"
+        android:label="@string/locker"
+        tools:layout="@layout/fragment_locker">
+        <action
+            android:id="@+id/action_lockerFragment_to_lockerItemFragment"
+            app:destination="@id/lockerItemFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/lockerItemFragment"
+        android:name="com.android.application.hazi.fragments.LockerItemFragment"
+        android:label="{lockerItemName}"
+        tools:layout="@layout/fragment_locker_item">
+        <argument
+            android:name="lockerItemName"
+            app:argType="string" />
+        <argument
+            android:name="lockerItemImage"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>

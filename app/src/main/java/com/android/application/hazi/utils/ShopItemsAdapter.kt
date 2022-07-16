@@ -15,8 +15,8 @@ interface ShopItemActionListener {
 
 class ShopItemsAdapter(
     private val shopItems: MutableList<ShopItem>,
-    private val shopItemClickListener: ShopItemActionListener)
-    : RecyclerView.Adapter<ShopItemsAdapter.ShopItemsViewHolder>(), View.OnClickListener {
+    private val shopItemClickListener: ShopItemActionListener
+    ) : RecyclerView.Adapter<ShopItemsAdapter.ShopItemsViewHolder>(), View.OnClickListener {
 
     override fun onClick(v: View) {
         val shopItem = v.tag as ShopItem

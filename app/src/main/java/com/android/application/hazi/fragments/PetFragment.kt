@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentPetBinding
 import com.google.firebase.auth.ktx.auth
@@ -36,33 +37,12 @@ class PetFragment : Fragment() {
 
         binding = FragmentPetBinding.bind(view)
 
-        val database =
-            FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
+        binding.openLockerButton.setOnClickListener { openLocker() }
 
-        val currentUserId = Firebase.auth.currentUser?.uid
-        lifecycleScope.launch {
-            val userDatabaseReference = database.reference.child("users")
-                .orderByChild("id").equalTo(currentUserId).get()
-                .await().children.first().ref
 
-            val userShopItemsRef = userDatabaseReference.child("shopItems")
+    }
 
-            userShopItemsRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    if (snapshot.value != null) {
-                        val shopItems: HashMap<*, HashMap<String, *>> =
-                            snapshot.value as HashMap<String, HashMap<String, *>>
-
-                        for (shopItem in shopItems.values) {
-
-                        }
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d(ShopItemFragment.TAG, "Database error occurred: $error")
-                }
-            })
-        }
+    private fun openLocker() {
+        findNavController().navigate(R.id.action_petFragment_to_lockerFragment)
     }
 }

@@ -33,4 +33,6 @@
     <string name="hunger">Hunger:</string>
     <string name="energy">Energy:</string>
     <string name="pet">Pet</string>
+    <string name="locker">Locker</string>
+    <string name="equip">Equip</string>
 </resources>
