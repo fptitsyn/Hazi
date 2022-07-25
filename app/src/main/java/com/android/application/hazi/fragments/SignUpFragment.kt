@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentSignUpBinding
+import com.android.application.hazi.models.Pet
 import com.android.application.hazi.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -102,12 +103,12 @@ class SignUpFragment : Fragment() {
     }
 
     private fun addUserToDatabase(email: String, password: String, id: String) {
-        var coins = 0
-        if (email == "fedor.kuritsyn@mail.ru") {
-            coins = 100000
-        }
+        val coins = 0
+        val baseHunger = 0
+        val baseEnergy = 100
+        val pet = Pet(baseHunger, baseEnergy, mutableListOf())
 
-        val user = User(email, password, id, coins)
+        val user = User(email, password, id, coins, pet)
 
         val usersDatabaseReference = database.reference.child("users")
         usersDatabaseReference.push().setValue(user)

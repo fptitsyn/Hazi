@@ -27,7 +27,6 @@ class ShopItemFragment : Fragment() {
     private val args by navArgs<ShopItemFragmentArgs>()
 
     private lateinit var userDatabaseReference: DatabaseReference
-    private var currentUserId: String? = ""
 
     private var userCoins = 0
 
@@ -89,7 +88,7 @@ class ShopItemFragment : Fragment() {
         val database =
             FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
 
-        currentUserId = Firebase.auth.currentUser?.uid
+        val currentUserId = Firebase.auth.currentUser?.uid
         lifecycleScope.launch {
             userDatabaseReference = database.reference.child("users")
                 .orderByChild("id").equalTo(currentUserId).get()

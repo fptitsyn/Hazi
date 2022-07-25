@@ -224,6 +224,7 @@ class TasksFragment : Fragment() {
                     val coinsAward = 5 + 1 * task.difficulty!!
 
                     addCoinsToCurrentUser(coinsAward)
+                    handlePetStateOnTaskComplete()
 
                     Toast.makeText(context, "+$coinsAward coins!", Toast.LENGTH_SHORT).show()
                     checkBox.isChecked = false
@@ -252,6 +253,28 @@ class TasksFragment : Fragment() {
 
             override fun onCancelled(error: DatabaseError) {
                 Log.d(TAG, "Database error occurred: $error")
+            }
+        })
+    }
+
+    private fun handlePetStateOnTaskComplete() {
+        val petRef = userDatabaseReference.child("pet")
+
+        petRef.child("energy").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var energy = snapshot.value.toString().toInt()
+
+                if (energy >= 5) {
+                    energy -= 5
+
+                    petRef.child("energy").setValue(energy)
+                }
+
+                Log.d(TAG, energy.toString())
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d(ShopItemFragment.TAG, "Database error occurred: $error")
             }
         })
     }
