@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/123/StudioProjects/Hazi/app/src/main/res/drawable/ic_locker.xml" value="0.2395" />
+        <entry key="..\:/Users/123/StudioProjects/Hazi/app/src/main/res/layout/fragment_pet.xml" value="0.271875" />
+        <entry key="..\:/Users/123/StudioProjects/Hazi/app/src/main/res/layout/fragment_shop_item.xml" value="0.19722222222222222" />
+        <entry key="..\:/Users/123/StudioProjects/Hazi/app/src/main/res/menu/edit_task_menu.xml" value="0.271875" />
+        <entry key="..\:/Users/123/StudioProjects/Hazi/app/src/main/res/menu/open_locker_menu.xml" value="0.2708333333333333" />
         <entry key="..\:/Users/fedya/AndroidStudioProjects/Hazi/app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.1125" />
         <entry key="..\:/Users/fedya/AndroidStudioProjects/Hazi/app/src/main/res/layout/activity_add_task.xml" value="0.22" />
         <entry key="..\:/Users/fedya/AndroidStudioProjects/Hazi/app/src/main/res/layout/activity_auth.xml" value="0.17447916666666666" />

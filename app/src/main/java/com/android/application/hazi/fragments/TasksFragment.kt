@@ -1,6 +1,5 @@
 package com.android.application.hazi.fragments
 
-import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -18,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentTasksBinding
 import com.android.application.hazi.models.Task
+import com.android.application.hazi.utils.MyApplication
 import com.android.application.hazi.utils.TaskActionListener
 import com.android.application.hazi.utils.TasksAdapter
 import com.google.firebase.auth.FirebaseAuth
@@ -244,17 +244,11 @@ class TasksFragment : Fragment() {
     private fun addCoinsToCurrentUser(coinsToAdd: Int) {
         val userCoins = userDatabaseReference.child("coins")
 
-        userCoins.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val currentCoins = snapshot.value.toString().toInt()
+        val currentCoins = MyApplication.coins
+        val updatedCoins = currentCoins + coinsToAdd
 
-                userCoins.setValue(currentCoins + coinsToAdd)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(TAG, "Database error occurred: $error")
-            }
-        })
+        userCoins.setValue(updatedCoins)
+        MyApplication.coins = updatedCoins
     }
 
     private fun handlePetStateOnTaskComplete() {

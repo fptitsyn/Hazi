@@ -13,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentShopItemBinding
 import com.android.application.hazi.models.ShopItem
+import com.android.application.hazi.utils.MyApplication
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
@@ -106,22 +107,9 @@ class ShopItemFragment : Fragment() {
                             Log.d(TAG, shopItem.toString())
                             val userShopItemName = shopItem["name"]
                             if (shopItemName == userShopItemName) {
-                                binding.buyShopItemButton.isEnabled = false
                                 canBuyItem = false
-
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Item already owned",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-
                                 break
                             }
-                        }
-
-                        // If an item is not already bought, check if user has enough money to buy the item
-                        if (canBuyItem) {
-                            binding.buyShopItemButton.isEnabled = userCoins >= shopItemPrice.toInt()
                         }
                     }
                 }
@@ -139,22 +127,36 @@ class ShopItemFragment : Fragment() {
         shopItemImage: String,
         coins: Int
     ) {
-        val userShopItems = userDatabaseReference.child("shopItems")
-        val shopItem = ShopItem(shopItemName, shopItemPrice.toInt(), shopItemImage)
-        userShopItems.push().setValue(shopItem)
+        if (canBuyItem) {
+            if (coins >= shopItemPrice.toInt()) {
+                val userShopItems = userDatabaseReference.child("shopItems")
+                val shopItem = ShopItem(shopItemName, shopItemPrice.toInt(), shopItemImage)
+                userShopItems.push().setValue(shopItem)
 
-        val userCoinsRef = userDatabaseReference.child("coins")
-        val coinsUpdated = coins - shopItemPrice.toInt()
-        userCoinsRef.setValue(coinsUpdated)
+                val userCoinsRef = userDatabaseReference.child("coins")
+                val coinsUpdated = coins - shopItemPrice.toInt()
+                userCoinsRef.setValue(coinsUpdated)
+                MyApplication.coins = coinsUpdated
 
-        binding.userCoins.text = coinsUpdated.toString()
+                binding.userCoins.text = coinsUpdated.toString()
 
-        Toast.makeText(
-            requireContext(),
-            "$shopItemName has been bought successfully",
-            Toast.LENGTH_SHORT
-        ).show()
+                Toast.makeText(
+                    requireContext(),
+                    "$shopItemName has been bought successfully",
+                    Toast.LENGTH_SHORT
+                ).show()
 
-        findNavController().navigateUp()
+                findNavController().navigateUp()
+            } else {
+                Toast.makeText(requireContext(), "You don't have enough coins", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Item already owned",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }

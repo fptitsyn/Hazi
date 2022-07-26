@@ -33,9 +33,11 @@ class EnergyWorker(context: Context, workerParams: WorkerParameters) : Coroutine
 
                 if (energy <= 90) {
                     energy += 10
-
-                    petRef.child("energy").setValue(energy)
+                } else {
+                    energy = 100
                 }
+
+                petRef.child("energy").setValue(energy)
 
                 Log.d("EnergyWorker", energy.toString())
             }
