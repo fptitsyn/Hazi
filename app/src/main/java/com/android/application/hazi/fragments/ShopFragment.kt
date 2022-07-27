@@ -10,8 +10,8 @@ import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentShopBinding
 import com.android.application.hazi.models.ShopItem
 import com.android.application.hazi.utils.MyApplication
-import com.android.application.hazi.utils.ShopItemActionListener
-import com.android.application.hazi.utils.ShopItemsAdapter
+import com.android.application.hazi.adapters.ShopItemActionListener
+import com.android.application.hazi.adapters.ShopItemsAdapter
 
 class ShopFragment : Fragment() {
 

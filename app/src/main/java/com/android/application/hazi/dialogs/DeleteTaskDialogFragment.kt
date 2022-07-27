@@ -11,7 +11,7 @@ import com.android.application.hazi.R
 class DeleteTaskDialogFragment : DialogFragment() {
 
     companion object {
-        val TAG = DeleteTaskDialogFragment::class.java.simpleName
+        val TAG: String = DeleteTaskDialogFragment::class.java.simpleName
         val REQUEST_KEY = "$TAG:defaultRequestKey"
         const val KEY_RESPONSE = "RESPONSE"
     }

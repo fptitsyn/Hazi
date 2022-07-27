@@ -15,7 +15,7 @@ class DatePickerDialogFragment : DialogFragment(),
     private var selectedDate: Long = 0
 
     companion object {
-        val TAG = DatePickerDialogFragment::class.java.simpleName
+        val TAG: String = DatePickerDialogFragment::class.java.simpleName
         val REQUEST_KEY = "$TAG:defaultRequestKey"
         const val KEY_RESPONSE = "responseKey"
         const val SELECTED_DATE = "selectedDate"

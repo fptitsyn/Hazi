@@ -1,4 +1,4 @@
-package com.android.application.hazi.utils
+package com.android.application.hazi.adapters
 
 import android.view.LayoutInflater
 import android.view.View

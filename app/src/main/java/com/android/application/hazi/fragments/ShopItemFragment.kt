@@ -21,6 +21,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+@Suppress("UNCHECKED_CAST")
 class ShopItemFragment : Fragment() {
 
     private lateinit var binding: FragmentShopItemBinding

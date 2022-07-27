@@ -16,8 +16,8 @@ import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentCalendarBinding
 import com.android.application.hazi.models.Task
 import com.android.application.hazi.utils.MyApplication
-import com.android.application.hazi.utils.TaskActionListener
-import com.android.application.hazi.utils.TasksAdapter
+import com.android.application.hazi.adapters.TaskActionListener
+import com.android.application.hazi.adapters.TasksAdapter
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue

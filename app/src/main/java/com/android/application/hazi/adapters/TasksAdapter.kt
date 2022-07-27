@@ -1,4 +1,4 @@
-package com.android.application.hazi.utils
+package com.android.application.hazi.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +17,8 @@ interface TaskActionListener {
 
 class TasksAdapter(
     private val tasks: MutableList<Task>,
-    private val taskActionListener: TaskActionListener) :
+    private val taskActionListener: TaskActionListener
+) :
     RecyclerView.Adapter<TasksAdapter.TaskViewHolder>(), View.OnClickListener {
 
     override fun onClick(v: View) {

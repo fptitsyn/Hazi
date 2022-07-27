@@ -11,8 +11,8 @@ import androidx.navigation.fragment.findNavController
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentLockerBinding
 import com.android.application.hazi.models.ShopItem
-import com.android.application.hazi.utils.LockerItemActionListener
-import com.android.application.hazi.utils.LockerItemsAdapter
+import com.android.application.hazi.adapters.LockerItemActionListener
+import com.android.application.hazi.adapters.LockerItemsAdapter
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -22,6 +22,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+@Suppress("UNCHECKED_CAST")
 class LockerFragment : Fragment() {
 
     private lateinit var binding: FragmentLockerBinding
