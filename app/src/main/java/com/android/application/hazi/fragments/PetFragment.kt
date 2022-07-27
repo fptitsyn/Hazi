@@ -37,6 +37,7 @@ class PetFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
         val hungerWorkRequest = PeriodicWorkRequestBuilder<HungerWorker>(1, TimeUnit.HOURS)

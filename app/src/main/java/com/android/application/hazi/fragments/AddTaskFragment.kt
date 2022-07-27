@@ -110,7 +110,7 @@ class AddTaskFragment : Fragment() {
     }
 
     private fun addTask() {
-        // Get task info from ui and add push it into database
+        // Get task info from ui and push it into database
         val taskName = binding.taskNameEditText.text.trim().toString()
         val taskDescription = binding.taskDescriptionEditText.text.trim().toString()
         val taskDifficulty = when (binding.chooseDifficultySpinner.selectedItem.toString()) {

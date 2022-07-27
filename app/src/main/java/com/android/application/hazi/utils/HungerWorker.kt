@@ -35,6 +35,7 @@ class HungerWorker(context: Context, workerParams: WorkerParameters) : Coroutine
                     hunger += 10
 
                     petRef.child("hunger").setValue(hunger)
+                    MyApplication.coins = hunger
                 }
 
                 Log.d("HungerWorker", hunger.toString())

@@ -2,137 +2,112 @@ package com.android.application.hazi.fragments
 
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.Toast
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
-import androidx.fragment.app.*
-import androidx.lifecycle.Lifecycle
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.application.hazi.R
-import com.android.application.hazi.databinding.FragmentTasksBinding
+import com.android.application.hazi.databinding.FragmentCalendarBinding
 import com.android.application.hazi.models.Task
 import com.android.application.hazi.utils.MyApplication
 import com.android.application.hazi.utils.TaskActionListener
 import com.android.application.hazi.utils.TasksAdapter
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
 
-class TasksFragment : Fragment() {
+class CalendarFragment : Fragment() {
 
-    private lateinit var tasksAdapter: TasksAdapter
-    private lateinit var tasks: MutableList<Task>
+    private lateinit var binding: FragmentCalendarBinding
+
+    private lateinit var dateTasks: MutableList<Task>
+
+    private lateinit var userDatabaseReference: DatabaseReference
+
     private lateinit var tasksListener: ChildEventListener
 
-    private lateinit var database: FirebaseDatabase
-    private lateinit var userDatabaseReference: DatabaseReference
-    private lateinit var auth: FirebaseAuth
-
-    private lateinit var binding: FragmentTasksBinding
-
     companion object {
-        val TAG: String = TasksFragment::class.java.simpleName
+        val TAG: String = CalendarFragment::class.java.simpleName
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_tasks, container, false)
+        return inflater.inflate(R.layout.fragment_calendar, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding = FragmentTasksBinding.bind(view)
+        binding = FragmentCalendarBinding.bind(view)
 
-        initDatabase()
+        val database =
+            FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
 
-        val currentUserId = auth.currentUser?.uid
+        initRecyclerView()
+        initTasksListener()
+
+        val currentUserId = Firebase.auth.currentUser?.uid
         lifecycleScope.launch {
             userDatabaseReference = database.reference.child("users")
                 .orderByChild("id").equalTo(currentUserId).get()
                 .await().children.first().ref
 
             userDatabaseReference.child("tasks").addChildEventListener(tasksListener)
+            val currentDate = binding.tasksCalendarView.date
+            val format = SimpleDateFormat("yyyy-MM-dd")
+            val date = format.format(currentDate)
+            showTasksForSelectedDate(date)
         }
 
-        binding.addTaskFloatingActionButton.setOnClickListener { addTask() }
-
-        initTaskRecyclerView()
-
-        createMenu()
+        binding.tasksCalendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            // Months start from 0 for some reason so add +1
+            val correctMonth = month + 1
+            val date = if (correctMonth in 0..9) {
+            "$year-0${correctMonth}-$dayOfMonth"
+        } else {
+            "$year-${correctMonth}-$dayOfMonth"
+        }
+            showTasksForSelectedDate(date)
+        }
     }
 
-    private fun createMenu() {
-        val menuHost: MenuHost = requireActivity()
+    private fun initRecyclerView() {
+        dateTasks = mutableListOf()
 
-        menuHost.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.tasks_fragment_menu, menu)
-            }
+        binding.tasksCalendarRecyclerView.layoutManager = LinearLayoutManager(context)
 
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.sign_out -> {
-                        signOut()
-                        true
-                    }
-                    R.id.calendar -> {
-                        openCalendar()
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-    }
-
-    private fun initTaskRecyclerView() {
-        tasks = mutableListOf()
-
-        val taskRecyclerView = binding.taskRecyclerView
-        taskRecyclerView.layoutManager = LinearLayoutManager(context)
-        tasksAdapter = TasksAdapter(tasks, object : TaskActionListener {
-            // Handle click on task and open task editing mode
+        val adapter = TasksAdapter(dateTasks, object : TaskActionListener {
             override fun onTaskClick(task: Task) {
                 editTask(task)
             }
 
-            // Handle click on task's checkbox and complete the task
             override fun onTaskCompleted(task: Task, checkBox: CheckBox) {
                 completeTask(task, checkBox)
             }
         })
 
-        taskRecyclerView.adapter = tasksAdapter
+        binding.tasksCalendarRecyclerView.adapter = adapter
     }
 
-    private fun initDatabase() {
-        database = FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
-        auth = Firebase.auth
-
+    private fun initTasksListener() {
         tasksListener = object : ChildEventListener {
-            // Task added
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val task = snapshot.getValue<Task>()
 
-                if (task != null) {
-                    tasks.add(task)
-                    tasksAdapter.notifyItemInserted(tasks.size)
-                    Log.d("tasksAmount", tasks.size.toString())
-                }
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                // This is left empty on purpose, because it we would use the same code that we use for
+                // the main task recyclerview, it would just add all the tasks
             }
 
             // Task edited
@@ -146,8 +121,8 @@ class TasksFragment : Fragment() {
                         taskPosition = bundle.getInt(EditTaskFragment.RESPONSE_KEY)
                     }
 
-                    tasks[taskPosition] = task
-                    tasksAdapter.notifyItemChanged(taskPosition)
+                    dateTasks[taskPosition] = task
+                    binding.tasksCalendarRecyclerView.adapter?.notifyItemChanged(taskPosition)
                 }
             }
 
@@ -156,14 +131,14 @@ class TasksFragment : Fragment() {
                 val task = snapshot.getValue<Task>()
 
                 if (task != null) {
-                    tasks.remove(task)
-                    tasksAdapter.notifyDataSetChanged()
+                    dateTasks.remove(task)
+                    binding.tasksCalendarRecyclerView.adapter?.notifyDataSetChanged()
                 }
             }
 
             // Task moved (not sure what to do with this one
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+//                TODO("Not yet implemented")
             }
 
             // On database error
@@ -173,41 +148,42 @@ class TasksFragment : Fragment() {
         }
     }
 
-    private fun addTask() {
-        findNavController().navigate(R.id.action_tasksFragment_to_addTaskFragment)
-    }
+    private fun showTasksForSelectedDate(date: String) {
+        val tasksAmount = dateTasks.size
+        dateTasks.clear()
+        binding.tasksCalendarRecyclerView.adapter?.notifyItemRangeRemoved(0, tasksAmount)
 
-    // Sign out from the account
-    private fun signOut() {
-        userDatabaseReference.child("tasks").removeEventListener(tasksListener)
-        auth.signOut()
-        val topLevelHost = requireActivity().supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment?
-        val topLevelNavController = topLevelHost?.navController ?: findNavController()
-        topLevelNavController.navigate(R.id.signInFragment, null, navOptions {
-            popUpTo(R.id.tabsFragment) {
-                inclusive = true
+        val tasksRef = userDatabaseReference.child("tasks")
+
+        val taskQuery = tasksRef.orderByChild("date").equalTo(date)
+
+        taskQuery.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (taskSnapshot in snapshot.children) {
+                    val task = taskSnapshot.getValue<Task>()
+
+                    if (task != null) {
+                        dateTasks.add(task)
+                        binding.tasksCalendarRecyclerView.adapter?.notifyItemInserted(dateTasks.size)
+                    }
+                }
             }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, "Database error occurred: $error")
+            }
+
         })
     }
 
-    // Remove listeners so app wouldn't crash on screen rotation
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-
-        if (this::userDatabaseReference.isInitialized) {
-            userDatabaseReference.child("tasks").removeEventListener(tasksListener)
-        }
-    }
-
     private fun editTask(task: Task) {
-        val direction = TasksFragmentDirections.actionTasksFragmentToEditTaskFragment(
+        val direction = CalendarFragmentDirections.actionCalendarFragmentToEditTaskFragment(
             task.name!!,
             task.description,
             task.difficulty!!,
             task.priority!!,
             task.date,
-            tasks.indexOf(task)
+            dateTasks.indexOf(task)
         )
 
         findNavController().navigate(direction)
@@ -215,7 +191,8 @@ class TasksFragment : Fragment() {
 
     private fun completeTask(task: Task, checkBox: CheckBox) {
         if (checkBox.isChecked) {
-            val taskQuery = userDatabaseReference.child("tasks").orderByChild("name").equalTo(task.name)
+            val taskQuery =
+                userDatabaseReference.child("tasks").orderByChild("name").equalTo(task.name)
 
             taskQuery.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -268,7 +245,7 @@ class TasksFragment : Fragment() {
                     petRef.child("energy").setValue(energy)
                 }
 
-                Log.d(TAG, energy.toString())
+                Log.d(TasksFragment.TAG, energy.toString())
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -277,7 +254,12 @@ class TasksFragment : Fragment() {
         })
     }
 
-    private fun openCalendar() {
-        findNavController().navigate(R.id.action_tasksFragment_to_calendarFragment)
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+
+        if (this::userDatabaseReference.isInitialized) {
+            userDatabaseReference.child("tasks").removeEventListener(tasksListener)
+        }
     }
 }

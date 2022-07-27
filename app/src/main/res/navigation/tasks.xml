@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_tasksFragment_to_editTaskFragment"
             app:destination="@id/editTaskFragment" />
+        <action
+            android:id="@+id/action_tasksFragment_to_calendarFragment"
+            app:destination="@id/calendarFragment" />
     </fragment>
     <fragment
         android:id="@+id/addTaskFragment"
@@ -47,5 +50,14 @@
         <argument
             android:name="taskPosition"
             app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.android.application.hazi.fragments.CalendarFragment"
+        android:label="@string/calendar"
+        tools:layout="@layout/fragment_calendar" >
+        <action
+            android:id="@+id/action_calendarFragment_to_editTaskFragment"
+            app:destination="@id/editTaskFragment" />
     </fragment>
 </navigation>

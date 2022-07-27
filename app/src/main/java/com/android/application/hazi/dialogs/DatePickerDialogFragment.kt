@@ -34,7 +34,13 @@ class DatePickerDialogFragment : DialogFragment(),
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
-        val stringDate = "$year-${month+1}-$dayOfMonth"
+        val correctMonth = month + 1
+
+        val stringDate: String = if (correctMonth in 0..9) {
+            "$year-0${correctMonth}-$dayOfMonth"
+        } else {
+            "$year-${correctMonth}-$dayOfMonth"
+        }
 
         setFragmentResult(REQUEST_KEY, bundleOf(KEY_RESPONSE to stringDate))
     }

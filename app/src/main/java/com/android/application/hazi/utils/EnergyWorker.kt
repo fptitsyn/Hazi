@@ -38,6 +38,7 @@ class EnergyWorker(context: Context, workerParams: WorkerParameters) : Coroutine
                 }
 
                 petRef.child("energy").setValue(energy)
+                MyApplication.coins = energy
 
                 Log.d("EnergyWorker", energy.toString())
             }
