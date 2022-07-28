@@ -84,6 +84,15 @@ class PetFragment : Fragment() {
         binding.hungerProgressBar.max = 100
         binding.energyProgressBar.max = 100
 
+        val hunger = MyApplication.hunger
+        val energy = MyApplication.energy
+
+        binding.hungerProgressBar.progress = hunger
+
+        binding.energyProgressBar.post {
+            binding.energyProgressBar.progress = energy
+        }
+
         createMenu()
 
         val database =
@@ -94,32 +103,6 @@ class PetFragment : Fragment() {
             userDatabaseReference = database.reference.child("users")
                 .orderByChild("id").equalTo(currentUserId).get()
                 .await().children.first().ref
-
-            val petRef = userDatabaseReference.child("pet")
-
-            petRef.child("hunger").addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val hunger = snapshot.value.toString().toInt()
-
-                    binding.hungerProgressBar.progress = hunger
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d(ShopItemFragment.TAG, "Database error occurred: $error")
-                }
-            })
-
-            petRef.child("energy").addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val energy = snapshot.value.toString().toInt()
-
-                    binding.energyProgressBar.progress = energy
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d(ShopItemFragment.TAG, "Database error occurred: $error")
-                }
-            })
         }
     }
 
@@ -150,10 +133,10 @@ class PetFragment : Fragment() {
         val hunger = binding.hungerProgressBar.progress
 
         if (hunger >= 10) {
-            Log.d(TAG, coins.toString())
             if (coins >= 5) {
                 val updatedHunger = hunger - 10
                 hungerRef.setValue(updatedHunger)
+                MyApplication.hunger = updatedHunger
                 binding.hungerProgressBar.progress = updatedHunger
 
                 val updatedCoins = coins - 5

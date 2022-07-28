@@ -112,7 +112,17 @@ class TasksFragment : Fragment() {
 
             // Handle click on task's checkbox and complete the task
             override fun onTaskCompleted(task: Task, checkBox: CheckBox) {
-                completeTask(task, checkBox)
+                val energy = MyApplication.energy
+                if (energy >= 5) {
+                    completeTask(task, checkBox)
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Your pet is too tired!", Toast.LENGTH_SHORT
+                    ).show()
+
+                    checkBox.isChecked = false
+                }
             }
         })
 
@@ -120,7 +130,8 @@ class TasksFragment : Fragment() {
     }
 
     private fun initDatabase() {
-        database = FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
+        database =
+            FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
         auth = Firebase.auth
 
         tasksListener = object : ChildEventListener {
@@ -131,7 +142,6 @@ class TasksFragment : Fragment() {
                 if (task != null) {
                     tasks.add(task)
                     tasksAdapter.notifyItemInserted(tasks.size)
-                    Log.d("tasksAmount", tasks.size.toString())
                 }
             }
 
@@ -181,7 +191,8 @@ class TasksFragment : Fragment() {
     private fun signOut() {
         userDatabaseReference.child("tasks").removeEventListener(tasksListener)
         auth.signOut()
-        val topLevelHost = requireActivity().supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment?
+        val topLevelHost =
+            requireActivity().supportFragmentManager.findFragmentById(R.id.fragmentContainer) as NavHostFragment?
         val topLevelNavController = topLevelHost?.navController ?: findNavController()
         topLevelNavController.navigate(R.id.signInFragment, null, navOptions {
             popUpTo(R.id.tabsFragment) {
@@ -215,7 +226,8 @@ class TasksFragment : Fragment() {
 
     private fun completeTask(task: Task, checkBox: CheckBox) {
         if (checkBox.isChecked) {
-            val taskQuery = userDatabaseReference.child("tasks").orderByChild("name").equalTo(task.name)
+            val taskQuery =
+                userDatabaseReference.child("tasks").orderByChild("name").equalTo(task.name)
 
             taskQuery.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -258,23 +270,13 @@ class TasksFragment : Fragment() {
     private fun handlePetStateOnTaskComplete() {
         val petRef = userDatabaseReference.child("pet")
 
-        petRef.child("energy").addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                var energy = snapshot.value.toString().toInt()
+        val energy = MyApplication.energy
+        val updatedEnergy = energy - 5
 
-                if (energy >= 5) {
-                    energy -= 5
+        petRef.child("energy").setValue(updatedEnergy)
+        MyApplication.energy = updatedEnergy
 
-                    petRef.child("energy").setValue(energy)
-                }
-
-                Log.d(TAG, energy.toString())
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(ShopItemFragment.TAG, "Database error occurred: $error")
-            }
-        })
+        Log.d(TAG, MyApplication.energy.toString())
     }
 
     private fun openCalendar() {

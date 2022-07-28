@@ -26,7 +26,7 @@ class TasksAdapter(
 
         when (v.id) {
             R.id.taskCompletedCheckBox -> {
-                taskActionListener.onTaskCompleted(task, v as CheckBox)
+                    taskActionListener.onTaskCompleted(task, v as CheckBox)
             }
             else -> {
                 taskActionListener.onTaskClick(task)

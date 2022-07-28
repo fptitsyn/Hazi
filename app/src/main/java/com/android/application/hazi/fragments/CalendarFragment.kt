@@ -31,9 +31,7 @@ class CalendarFragment : Fragment() {
     private lateinit var binding: FragmentCalendarBinding
 
     private lateinit var dateTasks: MutableList<Task>
-
     private lateinit var userDatabaseReference: DatabaseReference
-
     private lateinit var tasksListener: ChildEventListener
 
     companion object {
@@ -95,7 +93,17 @@ class CalendarFragment : Fragment() {
             }
 
             override fun onTaskCompleted(task: Task, checkBox: CheckBox) {
-                completeTask(task, checkBox)
+                val energy = MyApplication.energy
+                if (energy >= 5) {
+                    completeTask(task, checkBox)
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Your pet is too tired!", Toast.LENGTH_SHORT
+                    ).show()
+
+                    checkBox.isChecked = false
+                }
             }
         })
 
@@ -172,7 +180,6 @@ class CalendarFragment : Fragment() {
             override fun onCancelled(error: DatabaseError) {
                 Log.e(TAG, "Database error occurred: $error")
             }
-
         })
     }
 
@@ -235,23 +242,11 @@ class CalendarFragment : Fragment() {
     private fun handlePetStateOnTaskComplete() {
         val petRef = userDatabaseReference.child("pet")
 
-        petRef.child("energy").addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                var energy = snapshot.value.toString().toInt()
+        val energy = MyApplication.energy
+        val updatedEnergy = energy - 5
 
-                if (energy >= 5) {
-                    energy -= 5
-
-                    petRef.child("energy").setValue(energy)
-                }
-
-                Log.d(TasksFragment.TAG, energy.toString())
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(ShopItemFragment.TAG, "Database error occurred: $error")
-            }
-        })
+        petRef.child("energy").setValue(updatedEnergy)
+        MyApplication.energy = updatedEnergy
     }
 
     override fun onDestroyView() {

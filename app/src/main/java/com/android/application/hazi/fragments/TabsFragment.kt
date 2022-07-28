@@ -25,6 +25,10 @@ class TabsFragment : Fragment() {
 
     private lateinit var binding: FragmentTabsBinding
 
+    companion object {
+        val TAG: String = TabsFragment::class.java.simpleName
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,15 +55,44 @@ class TabsFragment : Fragment() {
                 .await().children.first().ref
 
             val userCoinsRef = userDatabaseReference.child("coins")
+
             userCoinsRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val userCoins = snapshot.value.toString().toInt()
                     MyApplication.coins = userCoins
-                    Log.d(PetFragment.TAG, userCoins.toString())
+                    Log.d(TAG, userCoins.toString())
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.d(ShopItemFragment.TAG, "Database error occurred: $error")
+                    Log.d(TAG, "Database error occurred: $error")
+                }
+            })
+
+            val energyRef = userDatabaseReference.child("pet").child("energy")
+
+            energyRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val userPetEnergy  = snapshot.value.toString().toInt()
+                    MyApplication.energy = userPetEnergy
+                    Log.d(TAG, userPetEnergy.toString())
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(TAG, "Database error occurred: $error")
+                }
+            })
+
+            val hungerRef = userDatabaseReference.child("pet").child("hunger")
+
+            hungerRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val userPetHunger = snapshot.value.toString().toInt()
+                    MyApplication.hunger = userPetHunger
+                    Log.d(TAG, userPetHunger.toString())
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(TAG, "Database error occurred: $error")
                 }
             })
         }
