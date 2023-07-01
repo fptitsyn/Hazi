@@ -1,5 +1,6 @@
 package com.android.application.hazi.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -46,6 +47,7 @@ class CalendarFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_calendar, container, false)
     }
 
+    @SuppressLint("SimpleDateFormat")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -65,6 +67,7 @@ class CalendarFragment : Fragment() {
 
             userDatabaseReference.child("tasks").addChildEventListener(tasksListener)
             val currentDate = binding.tasksCalendarView.date
+            // Need this exact formatting for the database
             val format = SimpleDateFormat("yyyy-MM-dd")
             val date = format.format(currentDate)
             showTasksForSelectedDate(date)
@@ -73,10 +76,17 @@ class CalendarFragment : Fragment() {
         binding.tasksCalendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             // Months start from 0 for some reason so add +1
             val correctMonth = month + 1
+
+            val day = if (dayOfMonth in 0..9) {
+                "0$dayOfMonth"
+            } else {
+                dayOfMonth.toString()
+            }
+
             val date = if (correctMonth in 0..9) {
-            "$year-0${correctMonth}-$dayOfMonth"
+            "$year-0${correctMonth}-$day"
         } else {
-            "$year-${correctMonth}-$dayOfMonth"
+            "$year-${correctMonth}-$day"
         }
             showTasksForSelectedDate(date)
         }
@@ -114,7 +124,7 @@ class CalendarFragment : Fragment() {
         tasksListener = object : ChildEventListener {
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                // This is left empty on purpose, because it we would use the same code that we use for
+                // This is left empty on purpose, because if we would use the same code that we use for
                 // the main task recyclerview, it would just add all the tasks
             }
 
@@ -139,8 +149,9 @@ class CalendarFragment : Fragment() {
                 val task = snapshot.getValue<Task>()
 
                 if (task != null) {
+                    val taskPosition = dateTasks.indexOf(task)
                     dateTasks.remove(task)
-                    binding.tasksCalendarRecyclerView.adapter?.notifyDataSetChanged()
+                    binding.tasksCalendarRecyclerView.adapter?.notifyItemRemoved(taskPosition)
                 }
             }
 

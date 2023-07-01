@@ -166,8 +166,9 @@ class TasksFragment : Fragment() {
                 val task = snapshot.getValue<Task>()
 
                 if (task != null) {
+                    val taskPosition = tasks.indexOf(task)
                     tasks.remove(task)
-                    tasksAdapter.notifyDataSetChanged()
+                    tasksAdapter.notifyItemRemoved(taskPosition)
                 }
             }
 
@@ -228,6 +229,8 @@ class TasksFragment : Fragment() {
         if (checkBox.isChecked) {
             val taskQuery =
                 userDatabaseReference.child("tasks").orderByChild("name").equalTo(task.name)
+
+            val taskPosition = tasks.indexOf(task)
 
             taskQuery.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {

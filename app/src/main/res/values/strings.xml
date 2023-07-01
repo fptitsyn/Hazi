@@ -37,4 +37,17 @@
     <string name="equip">Equip</string>
     <string name="image_of_your_pet">Image of your pet</string>
     <string name="calendar">Calendar</string>
+    <string name="exit">Exit</string>
+    <string name="try_again">Try again</string>
+    <string name="no_connection">No internet connection</string>
+    <string name="check_connection">Please check your internet connection and try again</string>
+    <string name="energy_full_title">Your pet energy is full</string>
+    <string name="energy_full_content">Let\'s get back to work!</string>
+    <string name="pet_channel_description_text">Updates of the pet\'s condition</string>
+    <string name="hunger_full_title">Your pet is hungry</string>
+    <string name="hunger_full_content">You better feed it!</string>
+    <string name="tasks_notification_title">You have some tasks that are about to become past due</string>
+    <string name="tasks_notification_content">Drag down to see the full list</string>
+    <string name="task_channel_description_text">Tasks notifications</string>
+    <string name="unequip">Unequip</string>
 </resources>

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.*
 import androidx.navigation.NavController
@@ -22,6 +23,16 @@ class MainActivity : AppCompatActivity() {
     private var navController: NavController? = null
 
     private val topLevelDestinations = setOf(getTabsDestination(), getSignInDestination())
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (isStartDestination(navController?.currentDestination)) {
+                finish()
+            } else {
+                navController?.popBackStack()
+            }
+        }
+    }
 
     private val fragmentListener = object : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentViewCreated(
@@ -47,20 +58,15 @@ class MainActivity : AppCompatActivity() {
         Log.i("destination", navController.graph.startDestinationId.toString())
 
         supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentListener, true)
+
+        onBackPressedDispatcher.addCallback(this,onBackPressedCallback)
+//        Firebase.auth.signOut()
     }
 
     override fun onDestroy() {
         supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentListener)
         navController = null
         super.onDestroy()
-    }
-
-    override fun onBackPressed() {
-        if (isStartDestination(navController?.currentDestination)) {
-            super.onBackPressed()
-        } else {
-            navController?.popBackStack()
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean = (navController?.navigateUp() ?: false) || super.onSupportNavigateUp()
@@ -105,7 +111,7 @@ class MainActivity : AppCompatActivity() {
     private fun prepareTitle(label: CharSequence?, arguments: Bundle?): String {
         if (label == null) return ""
         val title = StringBuffer()
-        val fillInPattern = Pattern.compile("\\{(.+?)\\}")
+        val fillInPattern = Pattern.compile("\\{(.+?)}")
         val matcher = fillInPattern.matcher(label)
         while (matcher.find()) {
             val argName = matcher.group(1)

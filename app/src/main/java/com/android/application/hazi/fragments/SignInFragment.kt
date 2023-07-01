@@ -51,7 +51,6 @@ class SignInFragment : Fragment() {
         } else {
             val email = binding.emailEditText.text.trim().toString()
             val password = binding.passwordEditText.text.trim().toString()
-
             Log.d("authStatus", "authUser")
                 activity?.let {
                     auth.signInWithEmailAndPassword(email, password)

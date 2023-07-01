@@ -16,16 +16,19 @@ import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentEditTaskBinding
 import com.android.application.hazi.dialogs.DatePickerDialogFragment
 import com.android.application.hazi.dialogs.DeleteTaskDialogFragment
+import com.android.application.hazi.dialogs.NetworkLossDialogFragment
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlin.system.exitProcess
 
 class EditTaskFragment : Fragment() {
 
     private lateinit var database: FirebaseDatabase
     private lateinit var tasksDatabaseReference: DatabaseReference
+    private lateinit var taskQuery: Query
     private var taskPosition = 0
     private var taskDate = ""
 
@@ -36,6 +39,7 @@ class EditTaskFragment : Fragment() {
     private lateinit var binding: FragmentEditTaskBinding
 
     companion object {
+        val TAG: String = EditTaskFragment::class.java.simpleName
         const val REQUEST_KEY = "taskPositionRK"
         const val RESPONSE_KEY = "taskPosition"
         const val TASK_DATE = "taskDate"
@@ -146,18 +150,20 @@ class EditTaskFragment : Fragment() {
                 .await().children.first().ref.child("tasks")
 
             setupDeletionConfirmDialog()
+            setupNetworkLossDialog()
+
+            taskQuery = tasksDatabaseReference.orderByChild("name").equalTo(taskToEditName)
         }
     }
 
     private fun editTask() {
-        val taskQuery = tasksDatabaseReference.orderByChild("name").equalTo(taskToEditName)
-
         val taskName = binding.editTaskNameEditText.text.toString()
         val taskDifficulty = binding.editDifficultySpinner.selectedItemId.toInt() + 1
         val taskDescription = binding.editTaskDescriptionEditText.text.toString()
         val taskPriority = binding.editPrioritySpinner.selectedItemId.toInt() + 1
         val taskDate = binding.editDateTextView.text.toString()
 
+//        try {
         taskQuery.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (taskSnapshot in snapshot.children) {
@@ -177,6 +183,32 @@ class EditTaskFragment : Fragment() {
                 Toast.makeText(activity, "Couldn't edit the task", Toast.LENGTH_SHORT).show()
             }
         })
+//        } catch (exc: Exception) {
+//            Log.d(TAG, exc.message.toString())
+//            showNetworkLossDialog()
+//        }
+    }
+
+    private fun setupNetworkLossDialog() {
+        parentFragmentManager.setFragmentResultListener(
+            NetworkLossDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+            when(result.getInt(NetworkLossDialogFragment.KEY_RESPONSE)) {
+                DialogInterface.BUTTON_POSITIVE -> {
+
+                }
+
+                DialogInterface.BUTTON_NEGATIVE -> {
+                    exitProcess(0)
+                }
+            }
+        }
+    }
+
+    private fun showNetworkLossDialog() {
+        val dialog = NetworkLossDialogFragment()
+        dialog.show(parentFragmentManager, NetworkLossDialogFragment.TAG)
     }
 
     private fun deleteTask() {
@@ -189,32 +221,38 @@ class EditTaskFragment : Fragment() {
     }
 
     private fun setupDeletionConfirmDialog() {
-        val taskQuery = tasksDatabaseReference.orderByChild("name").equalTo(taskToEditName)
-
         parentFragmentManager.setFragmentResultListener(
             DeleteTaskDialogFragment.REQUEST_KEY,
             viewLifecycleOwner
         ) { _, result ->
             when (result.getInt(DeleteTaskDialogFragment.KEY_RESPONSE)) {
-                DialogInterface.BUTTON_POSITIVE -> taskQuery.addListenerForSingleValueEvent(object :
-                    ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        for (taskSnapshot in snapshot.children) {
-                            taskSnapshot.ref.removeValue()
-                            break
-                        }
+                DialogInterface.BUTTON_POSITIVE -> {
+//                    try {
+                        taskQuery.addListenerForSingleValueEvent(
+                            object :
+                                ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    for (taskSnapshot in snapshot.children) {
+                                        taskSnapshot.ref.removeValue()
+                                        break
+                                    }
 
-                        findNavController().popBackStack()
-                    }
+                                    findNavController().popBackStack()
+                                }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(
-                            activity,
-                            "Couldn't delete the task",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                })
+                                override fun onCancelled(error: DatabaseError) {
+                                    Toast.makeText(
+                                        activity,
+                                        "Couldn't delete the task",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            })
+//                    } catch (exc: Exception) {
+//                        Log.d(TAG, exc.message.toString())
+//                        showNetworkLossDialog()
+//                    }
+                }
             }
         }
     }

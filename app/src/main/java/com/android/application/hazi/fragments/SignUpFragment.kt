@@ -73,7 +73,7 @@ class SignUpFragment : Fragment() {
                                 Log.d("createUserWithEmail", "createUserWithEmail:success")
 
                                 val user = auth.currentUser
-                                addUserToDatabase(email, password, user!!.uid)
+                                addUserToDatabase(email, user!!.uid)
 
                                 Toast.makeText(
                                     requireContext(),
@@ -102,17 +102,16 @@ class SignUpFragment : Fragment() {
         }
     }
 
-    private fun addUserToDatabase(email: String, password: String, id: String) {
+    private fun addUserToDatabase(email: String, id: String) {
         val coins = 0
         val baseHunger = 0
         val baseEnergy = 100
         val pet = Pet(baseHunger, baseEnergy, mutableListOf())
 
-        val user = User(email, password, id, coins, pet)
+        val user = User(email, id, coins, pet)
 
         val usersDatabaseReference = database.reference.child("users")
         usersDatabaseReference.push().setValue(user)
         Log.d("authStatus", "addUserToDatabase")
     }
-
 }

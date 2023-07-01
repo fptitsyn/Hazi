@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.android.application.hazi.R
@@ -44,6 +45,18 @@ class LockerItemFragment : Fragment() {
         } else {
             Glide.with(binding.lockerItemImageView.context).clear(binding.lockerItemImageView)
             binding.lockerItemImageView.setImageResource(R.drawable.ic_shop)
+        }
+
+        binding.equipLockerItemButton.setOnClickListener {
+            var status = ""
+            if (binding.equipLockerItemButton.text == getString(R.string.equip)) {
+                binding.equipLockerItemButton.text = getString(R.string.unequip)
+                status = "$lockerItemName equipped"
+            } else {
+                binding.equipLockerItemButton.text = getString(R.string.equip)
+                status = "$lockerItemName unequipped"
+            }
+            Toast.makeText(context, status, Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -1,7 +1,6 @@
 package com.android.application.hazi.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.view.MenuHost
@@ -10,18 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.work.*
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentPetBinding
-import com.android.application.hazi.utils.EnergyWorker
-import com.android.application.hazi.utils.HungerWorker
 import com.android.application.hazi.utils.MyApplication
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import java.util.concurrent.TimeUnit
 
 class PetFragment : Fragment() {
 
@@ -31,35 +26,6 @@ class PetFragment : Fragment() {
 
     companion object {
         val TAG: String = PetFragment::class.java.simpleName
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val hungerWorkRequest = PeriodicWorkRequestBuilder<HungerWorker>(1, TimeUnit.HOURS)
-            .setConstraints(constraints)
-            .setInitialDelay(1, TimeUnit.HOURS)
-            .build()
-
-        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-            "Hunger handling",
-            ExistingPeriodicWorkPolicy.KEEP,
-            hungerWorkRequest)
-
-        val energyWorkRequest = PeriodicWorkRequestBuilder<EnergyWorker>(1, TimeUnit.HOURS)
-            .setConstraints(constraints)
-            .setInitialDelay(1, TimeUnit.HOURS)
-            .build()
-
-        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-            "Energy handling",
-            ExistingPeriodicWorkPolicy.KEEP,
-            energyWorkRequest
-        )
     }
 
     override fun onCreateView(
@@ -87,7 +53,9 @@ class PetFragment : Fragment() {
         val hunger = MyApplication.hunger
         val energy = MyApplication.energy
 
-        binding.hungerProgressBar.progress = hunger
+        binding.hungerProgressBar.post {
+            binding.hungerProgressBar.progress = hunger
+        }
 
         binding.energyProgressBar.post {
             binding.energyProgressBar.progress = energy

@@ -13,6 +13,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="8dp"
+        android:minHeight="48dp"
+        android:maxWidth="480dp"
         android:autofillHints="emailAddress"
         android:hint="@string/enter_email"
         android:inputType="textEmailAddress"
@@ -27,6 +29,8 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="8dp"
+        android:maxWidth="480dp"
+        android:minHeight="48dp"
         android:autofillHints="password"
         android:hint="@string/enter_password"
         android:inputType="textPassword"
@@ -42,6 +46,8 @@
         android:layout_marginTop="30dp"
         android:layout_marginEnd="8dp"
         android:autofillHints="password"
+        android:maxWidth="480dp"
+        android:minHeight="48dp"
         android:hint="@string/confirm_password"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,12 +59,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="225dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="300dp"
         android:text="@string/create_account"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirmPasswordEditText" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
