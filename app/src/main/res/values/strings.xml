@@ -50,4 +50,6 @@
     <string name="tasks_notification_content">Drag down to see the full list</string>
     <string name="task_channel_description_text">Tasks notifications</string>
     <string name="unequip">Unequip</string>
+    <string name="request_notification_permission_dialog_message">Please allow our app to send you notifications about your pet\'s condition.
+                                                                Otherwise it will be hard for you to keep track of it.</string>
 </resources>

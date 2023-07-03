@@ -1,7 +1,10 @@
 package com.android.application.hazi.workers
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
@@ -84,7 +87,14 @@ class TasksNotificationWorker(context: Context, workerParams: WorkerParameters) 
                             .setAutoCancel(true)
 
                     with(NotificationManagerCompat.from(applicationContext)) {
-                        notify(NOTIFICATION_ID, builder.build())
+                        if (ActivityCompat.checkSelfPermission(
+                                applicationContext,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            return
+                        }
+                        notify(EnergyWorker.NOTIFICATION_ID, builder.build())
                     }
                 }
             }

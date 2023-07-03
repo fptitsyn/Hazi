@@ -111,13 +111,13 @@ class MainActivity : AppCompatActivity() {
     private fun prepareTitle(label: CharSequence?, arguments: Bundle?): String {
         if (label == null) return ""
         val title = StringBuffer()
-        val fillInPattern = Pattern.compile("\\{(.+?)}")
+        val fillInPattern = Pattern.compile("\\{(.+?)\\}")
         val matcher = fillInPattern.matcher(label)
         while (matcher.find()) {
             val argName = matcher.group(1)
             if (arguments != null && arguments.containsKey(argName)) {
                 matcher.appendReplacement(title, "")
-                title.append(arguments[argName].toString())
+                title.append(arguments.getString(argName))
             } else {
                 throw IllegalArgumentException(
                     "Could not find $argName in $arguments to fill label $label"

@@ -1,16 +1,29 @@
 package com.android.application.hazi.fragments
 
+import android.Manifest
+import android.content.DialogInterface
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.clearFragmentResultListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.android.application.hazi.R
 import com.android.application.hazi.databinding.FragmentPetBinding
+import com.android.application.hazi.dialogs.DatePickerDialogFragment
+import com.android.application.hazi.dialogs.RequestNotificationsPermissionDialogFragment
 import com.android.application.hazi.utils.MyApplication
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
@@ -24,6 +37,16 @@ class PetFragment : Fragment() {
 
     private lateinit var userDatabaseReference: DatabaseReference
 
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Toast.makeText(context, "Permission granted", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(context, "Permission not granted", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     companion object {
         val TAG: String = PetFragment::class.java.simpleName
     }
@@ -36,6 +59,7 @@ class PetFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_pet, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -62,6 +86,7 @@ class PetFragment : Fragment() {
         }
 
         createMenu()
+        setupRequestNotificationsPermissionDialog()
 
         val database =
             FirebaseDatabase.getInstance("https://hazi-8190a-default-rtdb.europe-west1.firebasedatabase.app/")
@@ -71,6 +96,14 @@ class PetFragment : Fragment() {
             userDatabaseReference = database.reference.child("users")
                 .orderByChild("id").equalTo(currentUserId).get()
                 .await().children.first().ref
+        }
+
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            showRequestNotificationsPermissionDialog()
         }
     }
 
@@ -121,5 +154,24 @@ class PetFragment : Fragment() {
 
     private fun openLocker() {
         findNavController().navigate(R.id.action_petFragment_to_lockerFragment)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun setupRequestNotificationsPermissionDialog() {
+        parentFragmentManager.setFragmentResultListener(
+            RequestNotificationsPermissionDialogFragment.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, result ->
+            when (result.getInt(RequestNotificationsPermissionDialogFragment.KEY_RESPONSE)) {
+                DialogInterface.BUTTON_POSITIVE -> {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        }
+    }
+
+    private fun showRequestNotificationsPermissionDialog() {
+        val requestNotifications = RequestNotificationsPermissionDialogFragment()
+        requestNotifications.show(parentFragmentManager, RequestNotificationsPermissionDialogFragment.TAG)
     }
 }
